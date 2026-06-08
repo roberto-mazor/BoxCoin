@@ -3,6 +3,7 @@ import { PageHeader } from '@/components/PageHeader'
 
 import { Input } from '@/components/Input'
 import { Button } from '@/components/Button'
+import { InputCurrency } from '@/components/InputCurrency'
 
 export default function Objetivo() {
   return (
@@ -10,14 +11,11 @@ export default function Objetivo() {
       <PageHeader
         titulo='Meta'
         subtitulo='Economize para alcançar sua meta financeira.'
-        rightButton={{
-          icon: 'edit',
-          onPress: () => console.log('Editar Meta')
-        }}
       />
 
       <View style={{ marginTop: 32, gap: 24 }}>
         <Input label="Nome da Meta" placeholder="Ex: Comprar um carro 0" />
+        <InputCurrency label='Valor alvo' value={0} />
 
         <Button
           titulo='Salvar'
