@@ -1,15 +1,86 @@
 import { View, Text } from 'react-native'
-import { useLocalSearchParams } from 'expo-router'
+import { router, useLocalSearchParams } from 'expo-router'
 
+import { PageHeader } from '@/components/PageHeader'
+import { Button } from '@/components/Button'
+import { Lista } from '@/components/Lista'
+import Progresso from '@/components/Progresso'
+import { Transacoes } from '@/components/Transacoes'
+import { TransacoesTypes } from '@/utils/TransacoesTypes'
+
+const detalhes = {
+  atual: 'R$ 2.000,00',
+  meta: 'R$ 4.000,00',
+  porcentagem: 50
+}
+
+const transacoes = [
+  {
+    id: '1',
+    value: 'R$ 300,00',
+    date: '12/04/2026',
+    descricao: 'CDB de 110% do CDI',
+    tipo: TransacoesTypes.Input
+  },
+  {
+    id: '2',
+    value: 'R$ 100,00',
+    date: '14/04/2026',
+    descricao: 'Retirada de emergencia',
+    tipo: TransacoesTypes.Output
+  },
+  {
+    id: '3',
+    value: 'R$ 700,00',
+    date: '16/04/2026',
+    descricao: 'CDB de 110% do CDI',
+    tipo: TransacoesTypes.Input
+  },
+  {
+    id: '4',
+    value: 'R$ 500,00',
+    date: '17/04/2026',
+    descricao: 'Compra Celular!',
+    tipo: TransacoesTypes.Output
+  },
+  {
+    id: '5',
+    value: 'R$ 900,00',
+    date: '17/04/2026',
+    descricao: 'Venda Celular Antigo!',
+    tipo: TransacoesTypes.Input
+  }
+]
 
 export default function EmProgresso() {
-    const params = useLocalSearchParams()
-    return (
-        <View>
-            <Text>
-                id: {params.id}
-            </Text>
+  const params = useLocalSearchParams<{ id: string }>()
+  return (
+    <View style={{ flex: 1, padding: 24, gap: 32 }}>
+      <PageHeader
+        titulo='Apple Watch'
+        rightButton={{
+          icon: 'edit',
+          onPress: () => console.log("Editando meta")
 
-        </View>
-    )
+        }}
+      />
+      <Progresso data={detalhes} />
+
+      <Lista
+        titulo='Transações'
+        data={transacoes}
+        renderItem={({ item }) => (
+          <Transacoes data={item} onRemove={() => console.log("Remover Transações")
+          } />
+        )}
+
+      />
+
+      <Button
+        titulo='Nova Transação'
+        onPress={() => router.navigate(`/transacao/${params.id}`)}
+      />
+
+    </View>
+  )
 }
