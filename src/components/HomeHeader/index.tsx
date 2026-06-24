@@ -6,52 +6,53 @@ import { styles } from './style';
 import { colors } from "@/theme/colors";
 import { Separador } from "@/components/Separador";
 import { Resumo, ResumoProps } from "@/components/Resumo";
+import { Inter_900Black, Inter_900Black_Italic } from "@expo-google-fonts/inter";
 
 export type HomeHeaderProps = {
-    total: string,
-    input: ResumoProps,
-    output: ResumoProps
+  total: string,
+  input: ResumoProps,
+  output: ResumoProps
 }
 
 type Props = {
-    data: HomeHeaderProps
+  data: HomeHeaderProps
 }
 
 export function HomeHeader({ data }: Props) {
-    return (
-        <LinearGradient
-            colors={[colors.blue[500], colors.blue[800]]}
-            style={styles.container}
-        >
+  return (
+    <LinearGradient
+      colors={[colors.blue[500], colors.blue[800]]}
+      style={styles.container}
+    >
 
-            <View>
-                <Text style={styles.label}>Total que você possui</Text>
-                <Text style={styles.total}>{data.total}</Text>
-            </View>
+      <View>
+        <Text style={styles.label}>Total que você possui</Text>
+        <Text style={styles.total}>{data.total}</Text>
+      </View>
 
-            <Separador color={colors.blue[400]} />
-            <View style={styles.resumoContainer}>
-                <Resumo
-                    data={data.input}
-                    icon={{
-                        nomeIcone: "arrow-upward",
-                        corIcone: colors.green[500]
-                    }}
-                />
+      <Separador color={colors.blue[400]} />
+      <View style={styles.resumoContainer}>
+        <Resumo
+          data={data.input}
+          icon={{
+            nomeIcone: "arrow-upward",
+            corIcone: colors.green[500]
+          }}
+        />
 
-                <Resumo
-                    data={data.output}
-                    icon={{
-                        nomeIcone: "arrow-downward",
-                        corIcone: colors.red[500]
-                    }}
-                    isRight={true}
-                />
+        <Resumo
+          data={data.output}
+          icon={{
+            nomeIcone: "arrow-downward",
+            corIcone: colors.red[500]
+          }}
+          isRight={true}
+        />
 
-            </View>
+      </View>
 
-        </LinearGradient>
+    </LinearGradient>
 
 
-    )
+  )
 }
