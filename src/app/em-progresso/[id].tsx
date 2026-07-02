@@ -1,5 +1,6 @@
-import { View, Text } from 'react-native'
-import { router, useLocalSearchParams } from 'expo-router'
+import { useCallback, useState } from 'react'
+import { View, Text, Alert } from 'react-native'
+import { router, useFocusEffect, useLocalSearchParams } from 'expo-router'
 
 import { PageHeader } from '@/components/PageHeader'
 import { Button } from '@/components/Button'
@@ -7,6 +8,12 @@ import { Lista } from '@/components/Lista'
 import Progresso from '@/components/Progresso'
 import { Transacoes } from '@/components/Transacoes'
 import { TransacoesTypes } from '@/utils/TransacoesTypes'
+
+import { useBoxCoinDatabase } from '@/database/useBoxCoinDatabase'
+
+
+
+
 
 const detalhes = {
   atual: 'R$ 2.000,00',
@@ -53,14 +60,42 @@ const transacoes = [
 ]
 
 export default function EmProgresso() {
+
+  const [detalhes, setDetalhes] = useState({
+    nome:"",
+    atual: "",
+    meta: "",
+    porcentagem: 0
+  })
   const params = useLocalSearchParams<{ id: string }>()
+
+  const boxCoinDatabase = useBoxCoinDatabase()
+
+  async function fetchDetalhes() {
+    try {
+      const response = boxCoinDatabase.show(Number(params.id))
+
+      setDetalhes({
+        nome: response?.name ? response.name : "",
+        atual: response?.current ? String(response.current) : "R$ 0,00",
+        meta: response?.amount ? String(response.amount) : "R$ 0,00",
+        porcentagem: response?.percentage ? response.percentage : 0
+      }) // fecha setDetalhes
+
+    } catch (error) { // fecha try
+      Alert.alert("Erro", "Não foi possivel carregar os detalhes da meta.")
+      console.log(error);
+    }
+  } 
+
+
   return (
     <View style={{ flex: 1, padding: 24, gap: 32 }}>
       <PageHeader
         titulo='Apple Watch'
         rightButton={{
           icon: 'edit',
-          onPress: () => console.log("Editando meta")
+          onPress: () => router.navigate (`/objetivo?id=${params.id}`)
 
         }}
       />

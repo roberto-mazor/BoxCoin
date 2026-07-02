@@ -15,6 +15,10 @@ export type BoxCoinResponse = {
   updated_at: Date
 }
 
+export type BoxCoinUpdate = BoxCoinCreate & {
+  id: number
+}
+
 
 export function useBoxCoinDatabase() {
   const database = useSQLiteContext()
@@ -27,6 +31,24 @@ export function useBoxCoinDatabase() {
       $name: data.name,
       $amount: data.amount
     })
+  }
+
+  function show(id: number) {
+    return database.getFirstSync<BoxCoinResponse>(`
+      SELECT
+        targets.id,
+        targets.name,
+        targets.amount,
+        COALESCE(SUM(transactions.amount), 0) AS current,
+        COALESCE((SUM(transactions.amount) / targets.amount) * 100, 0) AS percentage,
+        targets.created_at,
+        targets.updated_at
+
+      FROM targets
+      LEFT JOIN transactions ON transactions.target_id = targets.id 
+      WHERE targets.id = ${id}
+
+      `)
   }
 
 
@@ -50,9 +72,37 @@ export function useBoxCoinDatabase() {
 
   }
 
+  async function update(data: BoxCoinUpdate){
+    const conn = await database.prepareAsync(
+      `
+      UPDATE 
+        targets 
+      SET 
+        name = $name,
+        amount = $amount, 
+        updated_at = CURRENT_TIMESTAMP
+        WHERE id = $id
+      `
+    )
+    await conn.executeAsync({
+      $name: data.name,
+      $amount: data.amount,
+      $id: data.id
+    })
+  }
+
+  async function remove(id: number) {
+    await database.runAsync("DELETE FROM targets WHERE id = ?" , [id, ])
+    
+  }
+
+
   return {
     create,
-    listBySavedValue
+    listBySavedValue,
+    show,
+    update,
+    remove
   }
 
 }

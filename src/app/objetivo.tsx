@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Alert, View } from 'react-native'
 import { router, useLocalSearchParams } from 'expo-router'
 
@@ -22,11 +22,28 @@ export default function Objetivo() {
     }
 
     if (params.id) {
-      // update
+      atualizarDadosBanco()
     } else {
       salvarDadosBanco()
     }
 
+  }
+
+  async function atualizarDadosBanco() {
+    try {
+      await boxCoinDatabase.update({
+        name: nomeMeta,
+        amount: Number(valor),
+        id: Number(params.id)
+      })
+
+      Alert.alert("Sucesso", "Meta Atualizada com susesso",[
+        { text: "ok", onPress: () => router.back() }
+      ])
+    } catch (error) {
+      Alert.alert("Erro", "Não foi possivel carregaro Falha ao atualizar a meta")
+      console.log(error)
+    }
   }
 
   async function salvarDadosBanco() {
@@ -47,11 +64,60 @@ export default function Objetivo() {
     }
   }
 
+  async function fetchDetalhes(id: number) {
+    try {
+      const response = boxCoinDatabase.show(id)
+      setNomeMeta(response?.name ?? "")
+      setValor(response?.amount ?? 0)
+
+    } catch (error) {
+      Alert.alert("Não foi possivel carregar os detalhes da meta")
+      console.log(error)
+    }
+  }
+
+  async function FnuserDelete() {
+    try {
+      if (!params.id) {
+        return Alert.alert("Erro", "Não foi possivel identificar a meta") 
+      }
+
+      Alert.alert("Atenção", "Deseja excluir essa meta", [
+        {text: "Canelar", style: "cancel" },
+        { text: "Sim", onPress: async () => {await remover() }}
+      ])
+
+    } catch (error){
+      Alert.alert("Erro", "Erro ao excluir a meta")
+    }
+  }
+
+  async function remover() {
+    await boxCoinDatabase.remove(Number(params.id))
+    Alert.alert("Sucesso", "Meta excluida", [
+      {text: 'ok', onPress: () => router.replace("/")}
+    ])
+  }
+
+  useEffect (() => {
+    if(params.id){
+      fetchDetalhes(Number(params.id))
+    }
+  } ,[params.id]
+
+  )
+
   return (
     <View style={{ flex: 1, padding: 24, gap: 32 }}>
       <PageHeader
         titulo='Meta'
         subtitulo='Economize para alcançar sua meta financeira.'
+        rightButton={
+          params.id ? {
+            icon: 'delete',
+            onPress: () => fnUserDelete()
+          } : undefined
+        }
       />
 
       <View style={{ marginTop: 32, gap: 24 }}>
